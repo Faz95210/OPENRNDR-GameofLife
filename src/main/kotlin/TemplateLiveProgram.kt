@@ -9,14 +9,22 @@ import org.openrndr.extra.olive.oliveProgram
  *  oliveProgram {} can be changed while the program is running.
  */
 
+
 fun main() = application {
     configure {
-        width = 800
-        height = 800
+        width = WINDOW_WIDTH
+        height = WINDOW_HEIGHT
     }
     oliveProgram {
+        val grid = Grid(WINDOW_WIDTH, WINDOW_HEIGHT, SQUARE_SIZE)
         extend {
+            mouse.buttonUp.listen {
+                // -- it refers to a MouseEvent instance here
+                println(it.position)
+                grid.clickTrigger(it.position)
+            }
             drawer.clear(ColorRGBa.PINK)
+            grid.draw(drawer)
         }
     }
 }

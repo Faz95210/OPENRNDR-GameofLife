@@ -176,7 +176,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.5.0-RC")
     implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
-
+    implementation("org.jetbrains.kotlinx","multik-api", "0.1.1")
+    implementation("org.jetbrains.kotlinx", "multik-default", "0.1.1")
     when(applicationLogging) {
         Logging.NONE -> {
             runtimeOnly("org.slf4j","slf4j-nop","1.7.30")
