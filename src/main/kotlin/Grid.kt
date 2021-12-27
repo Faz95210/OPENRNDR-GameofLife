@@ -6,13 +6,13 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 class Grid(
-    width: Int = WINDOW_WIDTH,
-    height: Int = WINDOW_HEIGHT,
-    private val squareSize: Double = SQUARE_SIZE,
+    private var width: Int = WINDOW_WIDTH,
+    private var height: Int = WINDOW_HEIGHT,
+    private var squareSize: Double = SQUARE_SIZE,
 ) {
-    private val columns: Int = floor(width / squareSize).roundToInt()
-    private val rows: Int = floor(height / squareSize).roundToInt()
-    private val matrix: Array<Array<Square>> = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
+    private var columns: Int = floor(width / squareSize).roundToInt()
+    private var rows: Int = floor(height / squareSize).roundToInt()
+    private var matrix: Array<Array<Square>> = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
 
     fun getMatrix(): Array<Array<Square>> {
         return matrix
@@ -25,6 +25,18 @@ class Grid(
             }
         }
     }
+
+    fun changeSquareSize(squareSize: Double) {
+        this.squareSize = squareSize
+        initMatrix()
+    }
+
+    fun initMatrix() {
+        columns = floor(width / squareSize).roundToInt()
+        rows = floor(height / squareSize).roundToInt()
+        matrix = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
+    }
+
 
     fun randomizeGrid() {
         for (x in 0 until columns) {

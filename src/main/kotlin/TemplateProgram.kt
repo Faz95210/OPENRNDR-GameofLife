@@ -1,7 +1,8 @@
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 
-var TICK_BY_RUN = 10
+val GAME_GRID = Grid(WINDOW_WIDTH, WINDOW_HEIGHT, SQUARE_SIZE)
+var isRunning = false
 
 fun countNeighbors(x: Int, y: Int, matrix: Array<Array<Square>>): Int {
     var neighbors = 0
@@ -72,40 +73,31 @@ fun main() = application {
 
     program {
         var counter = 0
-        val grid = Grid(WINDOW_WIDTH, WINDOW_HEIGHT, SQUARE_SIZE)
-        var isRunning = false
-        keyboard.keyUp.listen {
-            when (it.name) {
-                "space" -> {
-                    isRunning = !isRunning
-                }
-                "c", "C" -> {
-                    grid.clearGrid()
-                }
-                "r", "R" -> {
-                    grid.randomizeGrid()
-                }
-                "arrow-up" -> {
-                    if (TICK_BY_RUN > 0)
-                        TICK_BY_RUN -= 1
-                }
-                "arrow-down" -> {
-                    TICK_BY_RUN += 1
-                }
-                else -> {
-                    println("Pressed ${it.name} ${it.key} ")
-                }
-            }
-        }
-        mouse.buttonUp.listen {
-            grid.clickTrigger(it.position)
-        }
+        val userInterface = generateUserInterface()
+
+        keyboard.keyUp.listen(::keyboardListener)
+        mouse.buttonUp.listen(::clickListener)
+
+
+
+        extend(userInterface)
+
         extend {
+
+            if (SQUARE_SIZE != GUI_SETTINGS.squareSize) {
+                SQUARE_SIZE = GUI_SETTINGS.squareSize
+                GAME_GRID.changeSquareSize(SQUARE_SIZE)
+            }
+
+            if (TICK_BY_RUN != GUI_SETTINGS.tickDuration) {
+                TICK_BY_RUN = GUI_SETTINGS.tickDuration
+            }
+
             drawer.clear(ColorRGBa.PINK)
-            grid.draw(drawer)
-            if (grid.getMatrix().isNotEmpty() && isRunning)
+            GAME_GRID.draw(drawer)
+            if (GAME_GRID.getMatrix().isNotEmpty() && isRunning)
                 if (counter >= TICK_BY_RUN) {
-                    processGameOfLife(grid.getMatrix())
+                    processGameOfLife(GAME_GRID.getMatrix())
                     counter = 0
                 } else {
                     counter += 1
