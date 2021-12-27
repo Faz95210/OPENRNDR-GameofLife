@@ -1,8 +1,3 @@
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.zeros
-import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
-import org.jetbrains.kotlinx.multik.ndarray.data.get
-import org.jetbrains.kotlinx.multik.ndarray.data.set
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.extra.noise.random
@@ -17,16 +12,16 @@ class Grid(
 ) {
     private val columns: Int = floor(width / squareSize).roundToInt()
     private val rows: Int = floor(height / squareSize).roundToInt()
-    private val matrix = mk.zeros<Int>(columns, rows)
+    private val matrix: Array<Array<Square>> = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
 
-    fun getMatrix(): D2Array<Int> {
+    fun getMatrix(): Array<Array<Square>> {
         return matrix
     }
 
     fun clearGrid() {
         for (x in 0 until columns) {
             for (y in 0 until rows) {
-                matrix[x, y] = 0
+                matrix[x][y].empty()
             }
         }
     }
@@ -34,7 +29,10 @@ class Grid(
     fun randomizeGrid() {
         for (x in 0 until columns) {
             for (y in 0 until rows) {
-                matrix[x, y] = random(0.0, 1.1).toInt()
+                if (random(0.0, 1.1).toInt() == 0)
+                    matrix[x][y].empty()
+                else
+                    matrix[x][y].giveBirth()
             }
         }
     }
@@ -42,15 +40,10 @@ class Grid(
     fun draw(drawer: Drawer) {
         for (x in 0 until columns) {
             for (y in 0 until rows) {
-                if (matrix[x, y] == 0) {
-                    drawer.fill = ColorRGBa.BLACK
-                    drawer.stroke = ColorRGBa.WHITE
-                    drawer.strokeWeight = 1.0
-                } else {
-                    drawer.fill = ColorRGBa.WHITE
-                    drawer.stroke = ColorRGBa.BLACK
-                    drawer.strokeWeight = 1.0
-                }
+                val square = matrix[x][y].getSquare()
+                drawer.fill = square["fill"] as ColorRGBa?
+                drawer.stroke = square["stroke"] as ColorRGBa?
+                drawer.strokeWeight = square["strokeWeight"] as Double
                 drawer.rectangle(
                     x * squareSize,
                     y * squareSize,
@@ -64,13 +57,10 @@ class Grid(
     fun clickTrigger(position: Vector2) {
         val squareX: Int = floor(position.x / squareSize).toInt()
         val squareY: Int = floor(position.y / squareSize).toInt()
-        val onOrOff: Int = matrix[squareX, squareY]
-        println("Position: $position square X =  $squareX square Y =  $squareY current value = $onOrOff")
-
-        if (onOrOff == 0) {
-            matrix[squareX, squareY] = 1
+        if (matrix[squareX][squareY].isAlive()) {
+            matrix[squareX][squareY].kill()
         } else {
-            matrix[squareX, squareY] = 0
+            matrix[squareX][squareY].giveBirth()
         }
     }
 }
