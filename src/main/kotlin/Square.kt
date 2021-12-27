@@ -4,7 +4,7 @@ class Square(size: Double) {
     private var status = Status.EMPTY
 
     private var fillColor = ColorRGBa(0.0, 0.0, 0.0)
-    private var strokeColor = ColorRGBa(1.0, 1.0, 1.0);
+    private var strokeColor = ColorRGBa(1.0, 1.0, 1.0)
 
     fun kill() {
         status = Status.DYING
@@ -29,10 +29,9 @@ class Square(size: Double) {
                 strokeColor = ColorRGBa(1.0, 1.0, 1.0)
             }
             Status.DYING -> {
-                val step = 1 / TICK_BY_RUN
-                if (fillColor.r > 0 && strokeColor.r < 1) {
+                val step = 1.0 / TICK_BY_RUN
+                if (fillColor.r > 0) {
                     fillColor = ColorRGBa(fillColor.r - step, fillColor.g - step, fillColor.b - step)
-                    strokeColor = ColorRGBa(fillColor.r + step, fillColor.g + step, fillColor.b + step)
                 } else {
                     fillColor = ColorRGBa(0.0, 0.0, 0.0)
                     strokeColor = ColorRGBa(1.0, 1.0, 1.0)
@@ -46,13 +45,9 @@ class Square(size: Double) {
             }
             Status.BIRTHING -> {
                 val step = 1.0 / TICK_BY_RUN
-                println(step)
-                println(status)
-                println(fillColor)
-                println(strokeColor)
                 if (fillColor.r < 1 && strokeColor.r > 0) {
                     fillColor = ColorRGBa(fillColor.r + step, fillColor.g + step, fillColor.b + step)
-                    strokeColor = ColorRGBa(fillColor.r - step, fillColor.g - step, fillColor.b - step)
+                    strokeColor = ColorRGBa(strokeColor.r - step, strokeColor.g - step, strokeColor.b - step)
                 } else {
                     fillColor = ColorRGBa(1.0, 1.0, 1.0)
                     strokeColor = ColorRGBa(0.0, 0.0, 0.0)
