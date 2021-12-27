@@ -46,21 +46,22 @@ fun countNeighbors(x: Int, y: Int, matrix: Array<Array<Square>>): Int {
 }
 
 fun processGameOfLife(matrix: Array<Array<Square>>) {
-
     for (x in matrix.indices) {
         for (y in matrix[x].indices) {
-            val neighbors = countNeighbors(x, y, matrix)
-            if (matrix[x][y].isAlive()) {
-                if (neighbors <= 1) {
-                    matrix[x][y].kill()
-                } else if (neighbors >= 4) {
-                    matrix[x][y].kill()
+            Runnable {
+                val neighbors = countNeighbors(x, y, matrix)
+                if (matrix[x][y].isAlive()) {
+                    if (neighbors <= 1) {
+                        matrix[x][y].kill()
+                    } else if (neighbors >= 4) {
+                        matrix[x][y].kill()
+                    }
+                } else {
+                    if (neighbors == 3) {
+                        matrix[x][y].giveBirth()
+                    }
                 }
-            } else {
-                if (neighbors == 3) {
-                    matrix[x][y].giveBirth()
-                }
-            }
+            }.run()
         }
     }
 }
@@ -78,8 +79,6 @@ fun main() = application {
         keyboard.keyUp.listen(::keyboardListener)
         mouse.buttonUp.listen(::clickListener)
 
-
-
         extend(userInterface)
 
         extend {
@@ -95,13 +94,14 @@ fun main() = application {
 
             drawer.clear(ColorRGBa.PINK)
             GAME_GRID.draw(drawer)
-            if (GAME_GRID.getMatrix().isNotEmpty() && isRunning)
+            if (GAME_GRID.getMatrix().isNotEmpty() && isRunning) {
                 if (counter >= TICK_BY_RUN) {
                     processGameOfLife(GAME_GRID.getMatrix())
                     counter = 0
                 } else {
                     counter += 1
                 }
+            }
         }
     }
 }
