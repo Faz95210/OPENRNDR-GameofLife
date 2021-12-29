@@ -1,3 +1,8 @@
+import org.jetbrains.kotlinx.multik.api.mk
+import org.jetbrains.kotlinx.multik.api.zeros
+import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
+import org.jetbrains.kotlinx.multik.ndarray.data.get
+import org.jetbrains.kotlinx.multik.ndarray.data.set
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.extra.noise.random
@@ -12,16 +17,16 @@ class Grid(
 ) {
     private var columns: Int = floor(width / squareSize).roundToInt()
     private var rows: Int = floor(height / squareSize).roundToInt()
-    private var matrix: Array<Array<Square>> = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
+    private var shallowMatrix = mk.zeros<Double>(columns, rows)
 
-    fun getMatrix(): Array<Array<Square>> {
-        return matrix
+    fun getMatrix(): D2Array<Double> {
+        return shallowMatrix
     }
 
     fun clearGrid() {
         for (x in 0 until columns) {
             for (y in 0 until rows) {
-                matrix[x][y].empty()
+                shallowMatrix[x, y] = 0.0
             }
         }
     }
@@ -31,31 +36,27 @@ class Grid(
         initMatrix()
     }
 
-    fun initMatrix() {
-        columns = floor(width / squareSize).roundToInt()
-        rows = floor(height / squareSize).roundToInt()
-        matrix = Array(columns) { Array(size = rows, init = { j -> Square(squareSize) }) }
-    }
-
-
     fun randomizeGrid() {
         for (x in 0 until columns) {
             for (y in 0 until rows) {
-                if (random(0.0, 1.1).toInt() == 0)
-                    matrix[x][y].empty()
-                else
-                    matrix[x][y].giveBirth()
+                shallowMatrix[x, y] = floor(random(0.0, 1.1))
             }
         }
     }
 
     fun draw(drawer: Drawer) {
-        for (x in 0 until columns) {
-            for (y in 0 until rows) {
-                val square = matrix[x][y].getSquare()
-                drawer.fill = square["fill"] as ColorRGBa?
-                drawer.stroke = square["stroke"] as ColorRGBa?
-                drawer.strokeWeight = square["strokeWeight"] as Double
+        for (x in 0 until shallowMatrix.shape[0]) {
+            for (y in 0 until shallowMatrix.shape[1]) {
+                if (shallowMatrix[x, y] == 0.0) {
+                    drawer.fill = ColorRGBa.BLACK
+                    drawer.stroke = ColorRGBa.BLACK
+                    drawer.strokeWeight = 0.0
+                } else {
+                    drawer.fill = ColorRGBa.WHITE
+                    drawer.stroke = ColorRGBa.BLACK
+                    drawer.strokeWeight = 0.0
+
+                }
                 drawer.rectangle(
                     x * squareSize,
                     y * squareSize,
@@ -69,10 +70,16 @@ class Grid(
     fun clickTrigger(position: Vector2) {
         val squareX: Int = floor(position.x / squareSize).toInt()
         val squareY: Int = floor(position.y / squareSize).toInt()
-        if (matrix[squareX][squareY].isAlive()) {
-            matrix[squareX][squareY].kill()
+        if (shallowMatrix[squareX, squareY] == 1.0) {
+            shallowMatrix[squareX, squareY] = 0.0
         } else {
-            matrix[squareX][squareY].giveBirth()
+            shallowMatrix[squareX, squareY] = 1.0
         }
+    }
+
+    private fun initMatrix() {
+        columns = floor(width / squareSize).roundToInt()
+        rows = floor(height / squareSize).roundToInt()
+        shallowMatrix = mk.zeros(columns, rows)
     }
 }
