@@ -10,14 +10,8 @@ import org.openrndr.math.Vector2
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-class Grid(
-    private var width: Int = WINDOW_WIDTH,
-    private var height: Int = WINDOW_HEIGHT,
-    private var squareSize: Double = SQUARE_SIZE,
-) {
-    private var columns: Int = floor(width / squareSize).roundToInt()
-    private var rows: Int = floor(height / squareSize).roundToInt()
-    private var shallowMatrix = mk.zeros<Double>(columns, rows)
+/*
+class Grid {
 
     fun getMatrix(): D2Array<Double> {
         return shallowMatrix
@@ -83,3 +77,4 @@ class Grid(
         shallowMatrix = mk.zeros(columns, rows)
     }
 }
+*/
