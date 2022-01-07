@@ -1,5 +1,4 @@
 import org.openrndr.application
-import utils.keyboardListener
 
 val gameManager = GameManager()
 var isRunning = false
@@ -11,8 +10,6 @@ fun main() = application {
     }
 
     program {
-        keyboard.keyUp.listen(::keyboardListener)
-
         extend(gameManager)
     }
 }
